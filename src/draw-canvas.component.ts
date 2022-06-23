@@ -40,6 +40,13 @@ export class DrawCanvas extends HTMLElement {
   }
 
   /**
+   * Getter for canvas
+   */
+  get canvas() : HTMLCanvasElement | undefined {
+    return this.service.getCanvas();
+  }
+
+  /**
    * List of attributes that are changeable on this component
    * @returns the observed attributes as a list of strings
    */

@@ -63,6 +63,14 @@ export class DrawCanvasService {
   }
 
   /**
+   * Returns the canvas html element inside
+   * @returns HtmlCanvasElement
+   */
+  public getCanvas(){
+    return this.canvas;
+  }
+
+  /**
    * Determine if the component has resized
    * @returns true if the component has resized since last animation frame
    */
