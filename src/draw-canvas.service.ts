@@ -177,6 +177,7 @@ export class DrawCanvasService {
     const selectedColor = { r: selectedPixel[0], g: selectedPixel[1], b: selectedPixel[2], a: selectedPixel[3] };
     const pixelStack = [point];
     const parsedFillColor = ParseRgbA(this.fillColor);
+    debugger;
     if (selectedColor.a == parsedFillColor.a &&
       selectedColor.r == parsedFillColor.r &&
       selectedColor.g == parsedFillColor.g &&
@@ -265,7 +266,7 @@ export class DrawCanvasService {
         }
         return rgb;
       } else if (/^rgb\((\d+).*?(\d+).*?(\d+)\)$/.test(color)) {
-        const obj = /^rgb\((\d+).*?(\d+).*?(\d+)\)$/.exec("rgb(0, 255, 0)");
+        const obj = /^rgb\((\d+).*?(\d+).*?(\d+)\)$/.exec(color);
         if (obj != null) {
           var rgb: IRGBA = {
             r: Number(obj![1]),
