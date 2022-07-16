@@ -22,6 +22,10 @@ export class DrawCanvasService {
     this.canvas.addEventListener('mousemove', this.handleMouseMove);
     this.canvas.addEventListener('mouseout', this.handleMouseUp);
     this.canvas.addEventListener('mouseup', this.handleMouseUp);
+    this.canvas.addEventListener('touchstart', this.handleTouchStart);
+    this.canvas.addEventListener('touchmove', this.handleTouchMove);
+    this.canvas.addEventListener('touchend', this.handleMouseUp);
+    this.canvas.addEventListener('touchcancel', this.handleMouseUp);
     this.canvas.width = this.component.clientWidth;
     this.canvas.height = this.component.clientHeight;
 
@@ -137,6 +141,28 @@ export class DrawCanvasService {
   }
 
   /**
+   * Handle touchstart events on canvas element
+   * @param {TouchEvent} e the touch event object
+   */
+  public handleTouchStart = (e: TouchEvent): void => {
+    if (!this.ctx) {
+      return;
+    }
+    const posX = e.touches[0].pageX - (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetLeft / 2;
+    var posY = e.touches[0].pageY - (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetTop;
+    if (this.filling) {
+      this.handleFill({ x: posX, y: posY })
+    } else {
+      posY = posY - e.touches[0].radiusY - this.strokeWeight/2;
+      this.drawing = true;
+      this.ctx.strokeStyle = this.strokeColor;
+      this.ctx.lineWidth = this.strokeWeight;
+      this.ctx.beginPath();
+      this.ctx.moveTo(posX, posY);
+    }
+  }
+
+  /**
    * Handle mousemove events on canvas element - does the drawing part
    * @param {MouseEvent} e the mouse event object
    */
@@ -147,6 +173,31 @@ export class DrawCanvasService {
     if (this.drawing) {
       const posX = e.offsetX;
       const posY = e.offsetY;
+      this.ctx.lineTo(posX, posY);
+      this.ctx.stroke();
+    }
+  }
+
+  /**
+   * Handle touchmove events on canvas element - does the drawing part
+   * @param {TouchEvent} e the touch event object
+   */
+  public handleTouchMove = (e: TouchEvent): void => {
+    e.preventDefault()
+    if (!this.ctx) {
+      return;
+    }
+    if (this.drawing) {
+      
+      const posX = e.touches[0].pageX - (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetLeft / 2;
+      const posY = e.touches[0].pageY - (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetTop
+        - e.touches[0].radiusY - this.strokeWeight/2;
+      console.log("T X: " + e.touches[0].pageX);
+      console.log("EL X: " + (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetLeft);
+      console.log("M X: " + posX);
+      console.log("T Y: " + e.touches[0].pageY);
+      console.log("EL Y: " + (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetTop);
+      console.log("M Y: " + posY);
       this.ctx.lineTo(posX, posY);
       this.ctx.stroke();
     }
@@ -177,7 +228,6 @@ export class DrawCanvasService {
     const selectedColor = { r: selectedPixel[0], g: selectedPixel[1], b: selectedPixel[2], a: selectedPixel[3] };
     const pixelStack = [point];
     const parsedFillColor = ParseRgbA(this.fillColor);
-    debugger;
     if (selectedColor.a == parsedFillColor.a &&
       selectedColor.r == parsedFillColor.r &&
       selectedColor.g == parsedFillColor.g &&
