@@ -148,8 +148,9 @@ export class DrawCanvasService {
     if (!this.ctx) {
       return;
     }
-    const posX = e.touches[0].pageX - (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetLeft / 2;
-    var posY = e.touches[0].pageY - (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetTop;
+    const canvasCoords = getCoords(<HTMLElement>e.target!);
+    const posX = e.touches[0].pageX - canvasCoords.left;
+    var posY = e.touches[0].pageY - canvasCoords.top;
     if (this.filling) {
       this.handleFill({ x: posX, y: posY })
     } else {
@@ -188,16 +189,10 @@ export class DrawCanvasService {
       return;
     }
     if (this.drawing) {
-      
-      const posX = e.touches[0].pageX - (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetLeft / 2;
-      const posY = e.touches[0].pageY - (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetTop
+      const canvasCoords = getCoords(<HTMLElement>e.target!);
+      const posX = e.touches[0].pageX - canvasCoords.left;
+      const posY = e.touches[0].pageY - canvasCoords.top
         - e.touches[0].radiusY - this.strokeWeight/2;
-      console.log("T X: " + e.touches[0].pageX);
-      console.log("EL X: " + (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetLeft);
-      console.log("M X: " + posX);
-      console.log("T Y: " + e.touches[0].pageY);
-      console.log("EL Y: " + (<HTMLElement>(<HTMLElement>e.target!).offsetParent!).offsetTop);
-      console.log("M Y: " + posY);
       this.ctx.lineTo(posX, posY);
       this.ctx.stroke();
     }
@@ -330,6 +325,24 @@ export class DrawCanvasService {
       throw new Error('Bad Color Value');
     }
   }
+}
+
+function getCoords(elem : HTMLElement) {
+  var box = elem.getBoundingClientRect();
+
+  var body = document.body;
+  var docEl = document.documentElement;
+
+  var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+  var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+  var clientTop = docEl.clientTop || body.clientTop || 0;
+  var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+  var top  = box.top +  scrollTop - clientTop;
+  var left = box.left + scrollLeft - clientLeft;
+
+  return { top: Math.round(top), left: Math.round(left) };
 }
 
 interface IRGBA {
